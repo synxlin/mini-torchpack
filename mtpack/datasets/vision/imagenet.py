@@ -41,8 +41,8 @@ class ImageNet(Dataset):
             test_transforms += extra_test_transforms
         test_transforms = transforms.Compose(test_transforms)
 
-        train = datasets.ImageNet(root=root, split='train', download=True, transform=train_transforms)
-        test = datasets.ImageNet(root=root, split='val', download=True, transform=test_transforms)
+        train = datasets.ImageNet(root=root, split='train', download=False, transform=train_transforms)
+        test = datasets.ImageNet(root=root, split='val', download=False, transform=test_transforms)
 
         # sample classes by strided indexing
         class_indices = dict()
