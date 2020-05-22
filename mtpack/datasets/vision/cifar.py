@@ -9,8 +9,7 @@ __all__ = ['CIFAR']
 
 
 class CIFAR(Dataset):
-    def __init__(self, root, num_classes, image_size,
-                 val_ratio=None, extra_train_transforms=None, extra_test_transforms=None):
+    def __init__(self, root, num_classes, image_size, val_ratio=None, extra_train_transforms=None):
         if num_classes == 10:
             dataset = datasets.CIFAR10
         elif num_classes == 100:
@@ -18,27 +17,29 @@ class CIFAR(Dataset):
         else:
             raise NotImplementedError('only support CIFAR10/100 for now')
 
-        train_transforms = [
+        train_transforms_pre = [
             transforms.RandomCrop(image_size, padding=4),
-            transforms.RandomHorizontalFlip(),
+            transforms.RandomHorizontalFlip()
+        ]
+        train_transforms_post = [
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010]),
         ]
         if extra_train_transforms is not None:
             if not isinstance(extra_train_transforms, list):
                 extra_train_transforms = [extra_train_transforms]
-            train_transforms += extra_train_transforms
-        train_transforms = transforms.Compose(train_transforms)
+            for ett in extra_train_transforms:
+                if isinstance(ett, (transforms.LinearTransformation, transforms.Normalize, transforms.RandomErasing)):
+                    train_transforms_post.append(ett)
+                else:
+                    train_transforms_pre.append(ett)
+        train_transforms = transforms.Compose(train_transforms_pre + train_transforms_post)
 
         test_transforms = [
             transforms.Resize(image_size),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010]),
         ]
-        if extra_test_transforms is not None:
-            if not isinstance(extra_test_transforms, list):
-                extra_test_transforms = [extra_test_transforms]
-            test_transforms += extra_test_transforms
         test_transforms = transforms.Compose(test_transforms)
 
         train = dataset(root=root, train=True, download=True, transform=train_transforms)
