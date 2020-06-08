@@ -23,3 +23,13 @@ class TopKClassMeter(Meter):
 
     def compute(self):
         return self.num_correct / max(self.num_examples, 1) * 100.
+
+    def data(self):
+        return {'num_examples': self.num_examples,
+                'num_correct': self.num_correct}
+    
+    def set(self, data):
+        if 'num_examples' in data:
+            self.num_examples = data['num_examples']
+        if 'num_correct' in data:
+            self.num_correct = data['num_correct']
