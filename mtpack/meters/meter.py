@@ -18,3 +18,11 @@ class Meter:
     @abstractmethod
     def compute(self):
         pass
+
+    @abstractmethod
+    def data(self):
+        pass
+
+    @abstractmethod
+    def set(self, data):
+        pass
