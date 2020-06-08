@@ -7,15 +7,20 @@ import six
 
 from .container import G
 
-__all__ = ['Config', 'configs', 'update_configs_from_module', 'update_configs_from_arguments']
+__all__ = ['Config', 'configs', 'update_configs_from_module',
+           'update_configs_from_arguments']
 
 
 class Config(G):
     def __init__(self, func=None, args=None, detach=False, **kwargs):
         if func is not None and not callable(func):
-            raise TypeError('func "{}" is not a callable function or class'.format(repr(func)))
-        if args is not None and not isinstance(args, (collections.Sequence, collections.UserList)):
-            raise TypeError('args "{}" is not an iterable tuple or list'.format(repr(args)))
+            raise TypeError(
+                f'func "{repr(func)}" is not a callable function or class')
+        if args is not None \
+            and not isinstance(args, (collections.Sequence,
+                                      collections.UserList)):
+            raise TypeError(
+                f'args "{repr(args)}" is not an iterable tuple or list')
 
         super().__init__(**kwargs)
         self._func_ = func
@@ -55,7 +60,9 @@ class Config(G):
         while queue:
             x = queue.popleft()
 
-            if not isinstance(x, six.string_types) and isinstance(x, (collections.Sequence, collections.UserList)):
+            if not isinstance(x, six.string_types) \
+                    and isinstance(x, (collections.Sequence,
+                                       collections.UserList)):
                 items = enumerate(x)
             elif isinstance(x, (collections.Mapping, collections.UserDict)):
                 items = x.items()
@@ -82,7 +89,8 @@ class Config(G):
             text += '\n'
             if self._args_:
                 for k, v in enumerate(self._args_):
-                    text += ' ' * indent + '[args:' + str(k) + '] = ' + str(v) + '\n'
+                    text += ' ' * indent + \
+                        '[args:' + str(k) + '] = ' + str(v) + '\n'
 
         for k, v in self.items():
             text += ' ' * indent + '[' + str(k) + ']'
@@ -133,7 +141,8 @@ def update_configs_from_module(*mods):
         if module in imported_modules:
             return
         imported_modules.add(module)
-        spec = importlib.util.spec_from_file_location(os.path.basename(module), module)
+        spec = importlib.util.spec_from_file_location(
+            os.path.basename(module), module)
         foo = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(foo)
 
@@ -159,7 +168,8 @@ def update_configs_from_arguments(args):
             raise Exception('unrecognized argument "{}"'.format(arg))
 
         if '=' in arg:
-            index, keys, val = index + 1, arg[:arg.index('=')].split('.'), arg[arg.index('=') + 1:]
+            index, keys, val = index + \
+                1, arg[:arg.index('=')].split('.'), arg[arg.index('=') + 1:]
         else:
             index, keys, val = index + 2, arg.split('.'), args[index + 1]
 
@@ -170,7 +180,8 @@ def update_configs_from_arguments(args):
             config = config[k]
 
         def parse(x):
-            if (x[0] == '\'' and x[-1] == '\'') or (x[0] == '\"' and x[-1] == '\"'):
+            if (x[0] == '\'' and x[-1] == '\'') \
+                    or (x[0] == '\"' and x[-1] == '\"'):
                 return x[1:-1]
             try:
                 x = eval(x)
